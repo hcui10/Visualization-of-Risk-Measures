@@ -1,17 +1,43 @@
+# hard-coded color palette
+color.list <- c("#1f77b4", # muted blue
+                "#9467bd", # muted purple
+                "#2ca02c") # cooked asparagus green
+
 # generate PDF, CDF, and VaR given distribution
 dist.helper <- function(distribution, distribution.params) {
   switch(distribution, 
-         "Normal" = 
-           list(ddist = function(x) dnorm(x, mean = distribution.params$mu, 
-                                          sd = distribution.params$sigma), 
-                pdist = function(q) pnorm(q, mean = distribution.params$mu, 
-                                          sd = distribution.params$sigma),
-                qdist = function(p) qnorm(p, mean = distribution.params$mu, 
-                                          sd = distribution.params$sigma)))
+         "beta" = function(p) 
+           qbeta(p, shape1 = distribution.params$shape1, shape2 = distribution.params$shape2),
+         "cauchy" = function(p) 
+           qcauchy(p, location = distribution.params$location, scale = distribution.params$scale),
+         "chisq" = function(p) 
+           qchisq(p, df = distribution.params$df),
+         "exp" = function(p) 
+           qexp(p, rate = distribution.params$rate),
+         "f" = function(p) 
+           qf(p, df1 = distribution.params$df1, df2 = distribution.params$df2),
+         "gamma" = function(p) 
+           qgamma(p, shape = distribution.params$shape, rate = distribution.params$rate),
+         "lnorm" = function(p) 
+           qlnorm(p, meanlog = distribution.params$meanlog, sdlog = distribution.params$sdlog),
+         "norm" = 
+           list(ddist = function(x) dnorm(x, mean = distribution.params$mean, 
+                                          sd = distribution.params$sd), 
+                pdist = function(q) pnorm(q, mean = distribution.params$mean, 
+                                          sd = distribution.params$sd),
+                qdist = function(p) qnorm(p, mean = distribution.params$mean, 
+                                          sd = distribution.params$sd)),
+         "t" = function(p) 
+           qt(p, df = distribution.params$df),
+         "unif" = function(p) 
+           qunif(p, min = distribution.params$min, max = distribution.params$max),
+         "weibull" = function(p) 
+           qweibull(p, shape = distribution.params$shape, scale = distribution.params$scale)
+  )
 }
 
 # generate data used for plots
-generate.data <- function(distribution, distribution.params) {
+generate.data <- function(distribution, distribution.params, n.points) {
   c(ddist, pdist, qdist) %<-% dist.helper(distribution, distribution.params)
   x.min  <- qdist(p = 0.0001) 
   x.max  <- qdist(p = 0.9999) 
@@ -42,8 +68,7 @@ plotly_plot <- function(plot.data, data.pt = NULL) {
                 hoverinfo = "text", 
                 text = ~paste("X: ", round.num(x, digits = 2), 
                               "<br> Density: ", round.num(fx, digits = 2)), 
-                # muted blue
-                color = I("#1f77b4")) %>% 
+                color = I(color.list[1])) %>% 
           add_lines(name = "PDF") %>% layout(yaxis = list(title = "$f_X(x)$")), 
         # Placeholder ---
         plot_ly(type = "scatter", mode = "lines"), # specify arguments to avoid warnings
@@ -53,8 +78,7 @@ plotly_plot <- function(plot.data, data.pt = NULL) {
                 text = ~paste("X: ", round.num(x, digits = 2), 
                               "<br> Cumulative Probability: ", 
                               round.num(Fx, digits = 2, type = "percent")), 
-                # muted purple
-                color = I("#9467bd")) %>% 
+                color = I(color.list[2])) %>% 
           add_lines() %>% 
           layout(xaxis = list(title = "$x$"), yaxis = list(title = "$p = F_X(x)$")), 
         # Rotated VaR Plot ---
@@ -63,8 +87,7 @@ plotly_plot <- function(plot.data, data.pt = NULL) {
                 text = ~paste("Value-at-Risk: ", round.num(VaR, digits = 2), 
                               "<br> Confidence Level: ", 
                               round.num(p, digits = 2, type = "percent")), 
-                # cooked asparagus green
-                color = I("#2ca02c")) %>% 
+                color = I(color.list[3])) %>% 
           add_lines() %>% 
           layout(xaxis = list(title = "$\\text{VaR}_X(p)$", autorange = "reversed")), 
         nrows = 2, shareX = TRUE, shareY = TRUE, which_layout = 3
@@ -74,8 +97,7 @@ plotly_plot <- function(plot.data, data.pt = NULL) {
               hoverinfo = "text", 
               text = ~paste("Confidence Level: ", round.num(p, digits = 2, type = "percent"), 
                             "<br> Value-at-Risk: ", round.num(VaR, digits = 2)), 
-              # cooked asparagus green
-              color = I("#2ca02c")) %>% 
+              color = I(color.list[3])) %>% 
         add_lines() %>% 
         layout(xaxis = list(title = "$p$"), yaxis = list(title = "$\\text{VaR}_X(p)$")), 
       widths = c(0.7, 0.3), titleX = TRUE, titleY = TRUE

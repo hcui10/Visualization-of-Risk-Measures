@@ -6,20 +6,52 @@ color.list <- c("#1f77b4", # muted blue
 # generate PDF, CDF, and VaR given distribution
 dist.helper <- function(distribution, distribution.params) {
   switch(distribution, 
-         "beta" = function(p) 
-           qbeta(p, shape1 = distribution.params$shape1, shape2 = distribution.params$shape2),
-         "cauchy" = function(p) 
-           qcauchy(p, location = distribution.params$location, scale = distribution.params$scale),
-         "chisq" = function(p) 
-           qchisq(p, df = distribution.params$df),
-         "exp" = function(p) 
-           qexp(p, rate = distribution.params$rate),
-         "f" = function(p) 
-           qf(p, df1 = distribution.params$df1, df2 = distribution.params$df2),
-         "gamma" = function(p) 
-           qgamma(p, shape = distribution.params$shape, rate = distribution.params$rate),
-         "lnorm" = function(p) 
-           qlnorm(p, meanlog = distribution.params$meanlog, sdlog = distribution.params$sdlog),
+         "beta" = 
+           list(ddist = function(x) dbeta(x, shape1 = distribution.params$shape1,
+                                          shape2 = distribution.params$shape2),
+                pdist = function(q) pbeta(q, shape1 = distribution.params$shape1,
+                                          shape2 = distribution.params$shape2),
+                qdist = function(p) qbeta(p, shape1 = distribution.params$shape1,
+                                          shape2 = distribution.params$shape2)),
+         "cauchy" = 
+           list(ddist = function(x) dcauchy(x, location = distribution.params$location,
+                                           scale = distribution.params$scale),
+                pdist = function(q) pcauchy(q, location = distribution.params$location,
+                                           scale = distribution.params$scale),
+                qdist = function(p) qcauchy(p, location = distribution.params$location,
+                                           scale = distribution.params$scale)),
+         "chisq" = 
+           list(
+             ddist = function(x) dchisq(x, df= distribution.params$df),
+             pdist = function(q) pchisq(q, df= distribution.params$df),
+             qdist = function(p) qchisq(p, df= distribution.params$df)),
+         "exp" = 
+           list(
+             ddist = function(x) dexp(x, rate = distribution.params$rate),
+             pdist = function(q) dexp(q, rate = distribution.params$rate),
+             qdist = function(p) dexp(p, rate = distribution.params$rate)),
+         "f" = 
+           list(
+             ddist = function(x) df(x,df1 = distribution.params$df1,
+                                    df2 = distribution.params$df2),
+             pdist = function(q) df(q,df1 = distribution.params$df1,
+                                    df2 = distribution.params$df2),
+             qdist = function(p) df(p,df1 = distribution.params$df1,
+                                    df2 = distribution.params$df2)),
+         "gamma" = 
+           list(ddist = function(x) dgamma(x, shape = distribution.params$shape,
+                                           rate = distribution.params$rate),
+                pdist = function(q) pgamma(q, shape = distribution.params$shape,
+                                           rate = distribution.params$rate),
+                qdist = function(p) qgamma(p, shape = distribution.params$shape,
+                                           rate = distribution.params$rate)),
+         "lnorm" = 
+           list(ddist = function(x) dlnorm(x, meanlog = distribution.params$meanlog,
+                                           sdlog = distribution.params$sdlog),
+                pdist = function(q) plnorm(q, meanlog = distribution.params$meanlog,
+                                           sdlog = distribution.params$sdlog),
+                qdist = function(p) qlnorm(p, meanlog = distribution.params$meanlog,
+                                           sdlog = distribution.params$sdlog)),
          "norm" = 
            list(ddist = function(x) dnorm(x, mean = distribution.params$mean, 
                                           sd = distribution.params$sd), 
@@ -27,13 +59,28 @@ dist.helper <- function(distribution, distribution.params) {
                                           sd = distribution.params$sd),
                 qdist = function(p) qnorm(p, mean = distribution.params$mean, 
                                           sd = distribution.params$sd)),
-         "t" = function(p) 
-           qt(p, df = distribution.params$df),
-         "unif" = function(p) 
-           qunif(p, min = distribution.params$min, max = distribution.params$max),
-         "weibull" = function(p) 
-           qweibull(p, shape = distribution.params$shape, scale = distribution.params$scale)
-  )
+         "t" = 
+           list(
+             ddist = function(x) dt(x, df= distribution.params$df),
+             pdist = function(q) pt(q, df= distribution.params$df),
+             qdist = function(p) qt(p, df= distribution.params$df)),
+         "unif" = 
+           list(
+             ddist = function(x) dunif(x, min = distribution.params$min,
+                                       max = distribution.params$max),
+             pdist = function(q) punif(q, min = distribution.params$min,
+                                       max = distribution.params$max),
+             qdist = function(p) qunif(p, min = distribution.params$min,
+                                       max = distribution.params$max)),
+         "weibull" = 
+           list(
+             ddist = function(x) dweibull(x, shape = distribution.params$shape,
+                                          scale = distribution.params$scale),
+             pdist = function(q) pweibull(x, shape = distribution.params$shape,
+                                          scale = distribution.params$scale),
+             qdist = function(p) qweibull(p, shape = distribution.params$shape,
+                                          scale = distribution.params$scale)
+           ))
 }
 
 # generate data used for plots

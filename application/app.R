@@ -1,5 +1,6 @@
 library("shiny")  # UI and reactive R expressions
 library("plotly") # interavtie plot functions
+library("zeallot")
 source("helpers.R")
 
 n.points <- 10000 # number of points to sample for x and p grids, hard-coded
@@ -85,9 +86,9 @@ server <- function(input, output) {
                           value = 1, min = 0.001) # >0 
            ), 
            "lnorm" = tagList(
-             numericInput(inputId = "lnorm.mean", label = "Log-Normal Param: Mean of Log(X) (mu)", 
+             numericInput(inputId = "lnorm.meanlog", label = "Log-Normal Param: Mean of Log(X) (mu)", 
                           value = 0), # any real number
-             numericInput(inputId = "lnorm.sd"  , label = "Log-Normal Param: Standard Deviation of Log(X) (sigma)", 
+             numericInput(inputId = "lnorm.sdlog"  , label = "Log-Normal Param: Standard Deviation of Log(X) (sigma)", 
                           value = 1, min = 0.001) # >0
            ), 
            "norm" = tagList(

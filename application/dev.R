@@ -23,8 +23,11 @@ plot.data <- generate.data(distribution, distribution.params, n.points)
 plotly_plot(plot.data)
 
 # assume this is the click data
-c(x0, p0) %<-% list(x = 2, p = pdist(2))
+c(x0, p0) %<-% list(x = -1, p = pdist(-1))
 
+#add_line data 
+al_dat <- data.frame(x=plot.data$x*(plot.data$x<=x0),fx=plot.data$fx*(plot.data$x<=x0))
+al_dat[,1][which(al_dat[,1]==0)]=x0
 # plot upon click
 subplot(
   subplot(
@@ -34,8 +37,8 @@ subplot(
             text = ~paste("X: ", round.num(x, digits = 2), 
                           "<br> Density: ", round.num(fx, digits = 2)), 
             color = I(color.list[1])) %>% 
-      add_lines(x = ~(x * (x <= x0)), 
-                y = ~(fx * (x <= x0)), 
+      add_lines(x = ~al_dat$x, 
+                y = ~al_dat$fx, 
                 fill = "tozeroy", name = "area under PDF") %>% 
       add_lines(name = "PDF") %>% 
       layout(yaxis = list(title = "$f_X(x)$")), 
@@ -71,4 +74,3 @@ subplot(
     layout(xaxis = list(title = "$p$"), yaxis = list(title = "$\\text{VaR}_X(p)$")), 
   widths = c(0.7, 0.3), titleX = TRUE, titleY = TRUE
 ) %>% layout(showlegend = FALSE)
-

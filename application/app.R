@@ -37,13 +37,26 @@ ui <- fluidPage(
       # Plotly interactive plots (2 by 2)
       plotly::plotlyOutput(outputId = "VaR.cont.plot"),
       # test
-      verbatimTextOutput("test", placeholder = TRUE)
+      verbatimTextOutput("test", placeholder = TRUE),
+      #click Event Data
+      verbatimTextOutput("click", placeholder = TRUE)
     )
   )
 )
 
 # Server logic
 server <- function(input, output) {
+  
+  # test
+  output$test <- renderPrint({
+    print(dist.params())
+  })
+  
+  #click
+  output$click <- renderPrint({
+    d <- event_data("plotly_click")
+    if (is.null(d)) "Click events appear here (double-click to clear)" else c(paste0("x = ",d$x),paste0("y = ",d$y))
+  })
   
   # Output: render UI for setting param for distribution--- 
   output$dist.param <- renderUI({
@@ -145,15 +158,12 @@ server <- function(input, output) {
   
   # Output: Plotly interactive plots (2 by 2)
   output$VaR.cont.plot <- plotly::renderPlotly({
+    click_data <- event_data("plotly_click")
     plot.data <- generate.data(input$dist, dist.params(), n.points)
-    plotly_plot(plot.data)
+    plotly_plot(plot.data, data.pt = click_data)
   })
   
   
-  # test
-  output$test <- renderPrint({
-    print(dist.params())
-  })
   
 }
 

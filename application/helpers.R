@@ -183,7 +183,6 @@ plotly_plot <- function(plot.data, data.pt = NULL) {
           add_lines(y = pnorm(x0), 
                     name = "area under CDF") %>% 
           add_lines(name = "CDF") %>% 
-          add_text()
           layout(xaxis = list(title = "$x$"), yaxis = list(title = "$p = F_X(x)$")), 
         # Rotated VaR Plot ---
         plot_ly(data = plot.data, x = ~VaR, y = ~p , name = "VaR rotated", 
